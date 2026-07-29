@@ -1,0 +1,657 @@
+/* ==========================================================================
+   main.css - design tokens, page layout, typography, panels, filters, prose.
+   Cartographic styling lives in map.css.
+
+   Theming works through custom properties only. Every colour in the project
+   is declared twice below - once for "parchment" (light) and once for "ink"
+   (dark) - and nothing further down the file hard-codes a colour. Adding a
+   third theme would mean adding one more block here and nothing else.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Type scale: a serif for reading and display, a sans for UI chrome. */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+                Georgia, "Times New Roman", serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+  --step-0:  clamp(0.95rem, 0.92rem + 0.15vw, 1.03rem);
+  --step-1:  clamp(1.12rem, 1.05rem + 0.35vw, 1.3rem);
+  --step-2:  clamp(1.4rem, 1.25rem + 0.7vw, 1.85rem);
+  --step-3:  clamp(1.9rem, 1.55rem + 1.6vw, 3rem);
+
+  --measure: 68ch;
+  --radius: 3px;
+  --radius-lg: 6px;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  --transition: 160ms cubic-bezier(0.2, 0, 0.2, 1);
+
+  color-scheme: light;
+
+  /* --- Parchment (light) ------------------------------------------------ */
+  --paper:        #efe4cd;   /* page plane */
+  --surface:      #f2e8d5;   /* cards - the validated light surface */
+  --surface-2:    #e8dbc0;   /* raised chrome: filter bar, panel */
+  --surface-3:    #ded0b2;   /* wells and hovers */
+  --land:         #f2e8d5;   /* map land; must read clearly against --sea */
+  --sea:          #cfd8d4;
+
+  --ink:          #241d12;   /* primary text */
+  --ink-2:        #57493a;   /* secondary text */
+  --ink-3:        #857761;   /* muted text, axis labels */
+
+  --rule:         #cbbb9c;   /* hairlines */
+  --rule-strong:  #a89a7d;
+
+  /* Category colours - validated on --surface with the dataviz validator.
+     Shape is the co-equal encoding; see config.js CATEGORIES. */
+  --cat-jewish:            #1c5cab;
+  --cat-christian:         #c25a1e;
+  --cat-monotheist:        #a63a86;
+  --cat-christian-context: #0f7a55;
+
+  --accent:       #8a5a12;
+  --focus:        #1c5cab;
+
+  --shadow-sm: 0 1px 2px rgba(36, 29, 18, 0.10);
+  --shadow-md: 0 4px 16px rgba(36, 29, 18, 0.14);
+  --shadow-lg: 0 12px 40px rgba(36, 29, 18, 0.20);
+
+  --grain-opacity: 0.045;
+}
+
+/* --- Ink (dark) --------------------------------------------------------- */
+/* Declared under both the OS media query and the explicit toggle, so the
+   toggle wins in both directions. The :not() guard lets a light stamp beat
+   OS-dark; :where() keeps the media block's specificity at zero. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+
+    --paper:        #0d1117;
+    --surface:      #141a22;
+    --surface-2:    #1c242e;
+    --surface-3:    #26303c;
+    --land:         #253040;
+    --sea:          #0a0f15;
+
+    --ink:          #f0e9dc;
+    --ink-2:        #b9ae9c;
+    --ink-3:        #8a8074;
+
+    --rule:         #2f3a47;
+    --rule-strong:  #46545f;
+
+    --cat-jewish:            #4b8fe0;
+    --cat-christian:         #d4762f;
+    --cat-monotheist:        #cc6aa9;
+    --cat-christian-context: #2fa176;
+
+    --accent:       #d8b26a;
+    --focus:        #4b8fe0;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.65);
+
+    --grain-opacity: 0.05;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper:        #0d1117;
+  --surface:      #141a22;
+  --surface-2:    #1c242e;
+  --surface-3:    #26303c;
+  --land:         #253040;
+  --sea:          #0a0f15;
+
+  --ink:          #f0e9dc;
+  --ink-2:        #b9ae9c;
+  --ink-3:        #8a8074;
+
+  --rule:         #2f3a47;
+  --rule-strong:  #46545f;
+
+  --cat-jewish:            #4b8fe0;
+  --cat-christian:         #d4762f;
+  --cat-monotheist:        #cc6aa9;
+  --cat-christian-context: #2fa176;
+
+  --accent:       #d8b26a;
+  --focus:        #4b8fe0;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.65);
+
+  --grain-opacity: 0.05;
+}
+
+/* --------------------------------------------------------------------------
+   2. Base
+   -------------------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* A faint fibre texture over the whole page. Pointer-events off so it never
+   intercepts a click; it is decoration only. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4 { line-height: 1.2; margin: 0; font-weight: 600; }
+p { margin: 0 0 1em; }
+a { color: inherit; text-underline-offset: 0.16em; text-decoration-thickness: 1px; }
+a:hover { color: var(--accent); }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.shell {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   3. Masthead
+   -------------------------------------------------------------------------- */
+
+.masthead {
+  padding: clamp(2rem, 5vw, 3.5rem) 0 var(--space-5);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Title left, theme toggle top-right, aligned to the first line of the title. */
+.masthead__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.masthead h1 {
+  font-size: var(--step-3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  max-width: 30ch;
+}
+
+.masthead__standfirst {
+  margin-top: var(--space-4);
+  max-width: 58ch;
+  color: var(--ink-2);
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition), color var(--transition),
+              border-color var(--transition);
+}
+.theme-toggle:hover { background: var(--surface-3); color: var(--ink); }
+.theme-toggle svg { width: 15px; height: 15px; }
+
+/* --------------------------------------------------------------------------
+   4. Filter bar
+   -------------------------------------------------------------------------- */
+
+.filters {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding: var(--space-3) 0;
+  margin-top: var(--space-5);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.filter {
+  position: relative;
+  font-family: var(--font-sans);
+}
+
+.filter__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--step--1);
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition),
+              color var(--transition);
+}
+.filter__button:hover { background: var(--surface-2); color: var(--ink); }
+.filter__button[aria-expanded="true"] {
+  background: var(--surface-2);
+  border-color: var(--rule-strong);
+  color: var(--ink);
+}
+.filter__button .chev { transition: transform var(--transition); }
+.filter__button[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+/* The little count badge that appears once a dimension is narrowed. */
+.filter__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.filter__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  min-width: 260px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  background: var(--surface-2);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.filter__menu[hidden] { display: none; }
+
+.filter__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--step--1);
+  text-align: left;
+  cursor: pointer;
+}
+.filter__option:hover { background: var(--surface-3); color: var(--ink); }
+.filter__option[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+
+.filter__check {
+  flex: none;
+  width: 14px; height: 14px;
+  display: grid; place-items: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+.filter__option[aria-pressed="true"] .filter__check {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.filter__check svg { width: 10px; height: 10px; }
+.filter__option[aria-pressed="false"] .filter__check svg { visibility: hidden; }
+
+.filter__swatch {
+  flex: none;
+  width: 12px; height: 12px;
+  color: var(--ink-3);
+}
+.filter__label { flex: 1; }
+.filter__tally {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+}
+
+.filters__status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+.filters__status strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.filters__reset {
+  padding: var(--space-1) var(--space-3);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: var(--step--1);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.filters__reset:hover { color: var(--ink); }
+.filters__reset[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   5. Map + detail panel layout
+   -------------------------------------------------------------------------- */
+
+.atlas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-5) 0 var(--space-7);
+}
+
+/* Once there is room, the detail panel docks beside the map instead of
+   overlaying it, so you can read a record and keep its context in view. */
+@media (min-width: 1080px) {
+  .atlas { grid-template-columns: minmax(0, 1fr) 380px; }
+  .atlas--closed { grid-template-columns: minmax(0, 1fr) 0; }
+  .atlas--closed .panel { opacity: 0; pointer-events: none; }
+}
+
+.panel {
+  transition: opacity var(--transition);
+}
+
+/* --------------------------------------------------------------------------
+   6. Detail panel
+   -------------------------------------------------------------------------- */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 78vh;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.panel[hidden] { display: none; }
+
+.panel__head {
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.panel__close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.panel__close:hover { background: var(--surface-3); color: var(--ink); }
+.panel__close svg { width: 14px; height: 14px; }
+
+.panel__kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+.panel__kicker svg { width: 13px; height: 13px; flex: none; }
+
+.panel__title {
+  font-size: var(--step-2);
+  padding-right: var(--space-6);
+  letter-spacing: -0.01em;
+}
+
+.panel__siglum {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+
+.panel__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  font-size: var(--step-0);
+}
+
+.panel__section + .panel__section { margin-top: var(--space-5); }
+
+.panel__section h3 {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--space-2);
+}
+
+/* Field list: label above value, so long values are never squeezed. */
+.fields { display: grid; gap: var(--space-3); }
+.field__label {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.field__value { margin-top: 2px; }
+.field__value--empty { color: var(--ink-3); font-style: italic; }
+
+.quote {
+  margin: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.quote--translit {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: 1.7;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+.quote--translation { font-style: italic; }
+.quote + .quote { margin-top: var(--space-3); }
+
+.refs { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-3); }
+.refs li {
+  padding-left: 1.1em;
+  text-indent: -1.1em;         /* hanging indent, bibliography style */
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.refs a { color: var(--accent); }
+
+/* Provenance / caveat notes */
+.note {
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius);
+  font-size: 0.88em;
+  color: var(--ink-2);
+}
+
+/* --------------------------------------------------------------------------
+   7. Prose sections below the map
+   -------------------------------------------------------------------------- */
+
+.section { padding: var(--space-7) 0; border-top: 1px solid var(--rule); }
+
+.section__header { margin-bottom: var(--space-6); }
+
+.section__eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--space-3);
+}
+
+.section h2 {
+  font-size: var(--step-2);
+  letter-spacing: -0.01em;
+  max-width: 30ch;
+}
+
+/* Distribution: the chart spans the full column width. */
+.distribution {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.chart-card {
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+.chart-card__title {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--ink);
+}
+.chart-card__subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  margin-top: 2px;
+  margin-bottom: var(--space-4);
+}
+
+/* Stat row above the chart */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.stat { border-top: 2px solid var(--rule-strong); padding-top: var(--space-3); }
+.stat__value {
+  font-size: var(--step-2);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat__label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: var(--space-2);
+}
+
+/* --------------------------------------------------------------------------
+   8. Bibliography
+   -------------------------------------------------------------------------- */
+
+.bibliography { max-width: 84ch; margin: 0; padding: 0; list-style: none; }
+.bibliography li {
+  padding-left: 2em;
+  text-indent: -2em;           /* hanging indent */
+  margin-bottom: var(--space-4);
+  font-size: 0.94em;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.bibliography a { color: var(--accent); }
+
+/* --------------------------------------------------------------------------
+   9. Motion preferences
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

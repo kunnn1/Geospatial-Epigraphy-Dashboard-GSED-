@@ -1,0 +1,378 @@
+/* ==========================================================================
+   map.css - the cartography.
+
+   The map is a single SVG built by js/map.js. Everything visual about it is
+   controlled here, so the drawing code can stay concerned with geometry and
+   leave appearance to CSS. Colours all come from the tokens in main.css.
+   ========================================================================== */
+
+.map-frame {
+  position: relative;
+  background: var(--sea);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  /* An explicit height rather than an aspect-ratio: the frame should take the
+     column width and let only its height answer to the viewport. (aspect-ratio
+     plus max-height would shrink the width too, since the browser preserves the
+     ratio when it clamps the height.) The projection refits to whatever box it
+     is given, so any size here is safe.
+
+     The width cap matters for composition: the mapped region is roughly as tall
+     as it is wide, so on a wide monitor an uncapped frame fits the map by
+     height and leaves the inscriptions huddled in a narrow central band.
+
+     The frame is a grid item, so the width is set explicitly and centred with
+     justify-self. Using `margin-inline: auto` here instead would switch the
+     item from stretch to shrink-to-fit and collapse it onto its own content. */
+  height: clamp(480px, 80vh, 860px);
+  width: min(100%, 1040px);
+  justify-self: center;
+}
+
+@media (max-width: 640px) {
+  .map-frame { height: clamp(420px, 68vh, 620px); }
+}
+
+.map-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;         /* let d3.zoom own the gestures */
+  cursor: grab;
+}
+.map-svg:active { cursor: grabbing; }
+
+/* --------------------------------------------------------------------------
+   Base layers
+   -------------------------------------------------------------------------- */
+
+.map-sea { fill: var(--sea); }
+
+.map-graticule {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 0.5;
+  opacity: 0.5;
+}
+
+.map-land {
+  fill: var(--land);
+  stroke: none;
+}
+
+/* Modern national borders, drawn as a light dashed hairline. They are an
+   anachronism on a map of late antiquity, so they are styled to read as a
+   reference grid rather than as historical information. */
+.map-border {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 0.7;
+  stroke-dasharray: 3 2.5;
+  opacity: 0.75;
+  vector-effect: non-scaling-stroke;
+}
+
+/* A soft halo where land meets sea, in the manner of engraved atlases. */
+.map-coast-glow {
+  fill: none;
+  stroke: var(--land);
+  stroke-width: 3;
+  opacity: 0.35;
+  vector-effect: non-scaling-stroke;
+}
+
+/* --------------------------------------------------------------------------
+   Labels
+   -------------------------------------------------------------------------- */
+
+.map-label {
+  pointer-events: none;
+  user-select: none;
+  paint-order: stroke fill;    /* halo behind the glyphs, never over them */
+}
+
+.map-label--country {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  fill: var(--ink-3);
+  stroke: var(--land);
+  stroke-width: 3px;
+  text-anchor: middle;
+  opacity: 0.9;
+}
+.map-label--country.is-small { font-size: 8.5px; letter-spacing: 0.1em; }
+
+.map-label--water {
+  font-family: var(--font-serif);
+  font-size: 11.5px;
+  font-style: italic;
+  letter-spacing: 0.22em;
+  fill: var(--ink-3);
+  stroke: var(--sea);
+  stroke-width: 2.5px;
+  text-anchor: middle;
+  opacity: 0.85;
+}
+.map-label--water.is-small { font-size: 9px; letter-spacing: 0.16em; }
+
+.map-label--desert {
+  font-family: var(--font-serif);
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  fill: var(--ink-3);
+  stroke: var(--land);
+  stroke-width: 2.5px;
+  text-anchor: middle;
+  opacity: 0.55;
+}
+.map-label--desert.is-small { font-size: 8px; letter-spacing: 0.2em; }
+
+/* Settlements. Ancient places are the subject of the map, so they get the
+   serif face and full contrast; modern cities are orientation aids and are
+   deliberately quieter. */
+.map-place-dot { fill: var(--ink-3); }
+.map-place-dot--ancient { fill: var(--ink-2); }
+
+.map-label--place {
+  font-family: var(--font-serif);
+  font-size: 11.5px;
+  fill: var(--ink);
+  stroke: var(--land);
+  stroke-width: 3px;
+  dominant-baseline: middle;
+}
+
+.map-label--modern {
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  fill: var(--ink-3);
+  stroke: var(--land);
+  stroke-width: 2.5px;
+  dominant-baseline: middle;
+}
+
+/* --------------------------------------------------------------------------
+   Inscription markers
+   -------------------------------------------------------------------------- */
+
+.marker {
+  cursor: pointer;
+  /* The transition is on opacity only. Transforms are recomputed on zoom, and
+     animating them would make panning feel laggy. */
+  transition: opacity var(--transition);
+}
+
+.marker__glyph {
+  stroke: var(--land);
+  stroke-width: 1.4;
+  paint-order: stroke fill;
+  transition: fill var(--transition);
+}
+
+/* Category fills. The shape differs too - see js/map.js glyphPath(). */
+.marker--jewish            .marker__glyph { fill: var(--cat-jewish); }
+.marker--christian         .marker__glyph { fill: var(--cat-christian); }
+.marker--monotheist        .marker__glyph { fill: var(--cat-monotheist); }
+.marker--christian-context .marker__glyph {
+  fill: none;
+  stroke: var(--cat-christian-context);
+  stroke-width: 2;
+}
+
+/* An invisible, generous hit area so small glyphs stay easy to hit. */
+.marker__hit { fill: transparent; stroke: none; }
+
+/* A ring that appears under the glyph on hover and selection. */
+.marker__halo {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.marker:hover .marker__halo,
+.marker.is-selected .marker__halo { opacity: 0.75; }
+
+.marker.is-selected .marker__glyph { stroke-width: 2.2; }
+
+/* Count badge for markers that stand for several texts (x12, x23). */
+.marker__count {
+  font-family: var(--font-sans);
+  font-size: 7.5px;
+  font-weight: 700;
+  fill: var(--paper);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.marker__count-bg { fill: var(--ink); }
+
+/* Filtered-out markers stay on the map but recede, so you can see what your
+   filter removed rather than watching points vanish into nothing. */
+.marker.is-muted { opacity: 0.1; pointer-events: none; }
+
+/* --------------------------------------------------------------------------
+   Tooltip
+   -------------------------------------------------------------------------- */
+
+.map-tooltip {
+  position: absolute;
+  z-index: 30;
+  max-width: 270px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.map-tooltip.is-visible { opacity: 1; transform: translateY(0); }
+
+.map-tooltip__kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.map-tooltip__kicker svg { width: 11px; height: 11px; flex: none; }
+
+.map-tooltip__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.map-tooltip__date {
+  margin-top: 3px;
+  font-size: 0.82rem;
+  color: var(--ink-2);
+}
+
+.map-tooltip__hint {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Map chrome: legend, zoom controls, attribution
+   -------------------------------------------------------------------------- */
+
+.map-legend {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 20;
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--surface-2) 94%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+}
+
+.map-legend__title {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--space-2);
+}
+
+.map-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px 0;
+  color: var(--ink-2);
+}
+.map-legend__item svg { width: 13px; height: 13px; flex: none; }
+.map-legend__item.is-muted { opacity: 0.4; }
+
+@media (max-width: 640px) {
+  .map-legend { font-size: 0.66rem; padding: var(--space-2) var(--space-3); }
+}
+
+.map-controls {
+  position: absolute;
+  right: var(--space-4);
+  top: var(--space-4);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.map-controls button {
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  background: var(--surface-2);
+  border: 0;
+  color: var(--ink-2);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+.map-controls button:hover { background: var(--surface-3); color: var(--ink); }
+.map-controls button svg { width: 13px; height: 13px; }
+
+.map-attribution {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-2);
+  z-index: 10;
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  color: var(--ink-3);
+  opacity: 0.7;
+}
+
+/* Shown when a filter combination matches nothing. */
+.map-empty {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: grid;
+  place-content: center;
+  gap: var(--space-3);
+  justify-items: center;
+  text-align: center;
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--sea) 78%, transparent);
+  backdrop-filter: blur(2px);
+}
+.map-empty[hidden] { display: none; }
+.map-empty__title { font-size: var(--step-1); font-weight: 600; }
+.map-empty__text {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  max-width: 34ch;
+}

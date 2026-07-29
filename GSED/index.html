@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Monotheistic Inscriptions of Pre-Islamic Arabia, c. 400–630 CE</title>
+  <meta name="description" content="An interactive map of the Jewish, Christian and unclassified monotheistic inscriptions of late antique Arabia, modelled on Ilkka Lindstedt's mapping and extended with recent scholarship.">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/map.css">
+</head>
+<body>
+
+<!-- ======================================================================
+     Masthead
+     ====================================================================== -->
+<header class="masthead">
+  <div class="shell">
+    <div class="masthead__inner">
+      <h1>The Monotheistic Inscriptions of Pre-Islamic Arabia</h1>
+      <button class="theme-toggle" type="button" data-theme-toggle></button>
+    </div>
+    <p class="masthead__standfirst">
+      Every datable Jewish, Christian or ḥanīf inscription between roughly 400 to 630&nbsp;CE,
+      plotted onto the map of pre-Islamic Arabia. Huge thanks to Ilkka Lindstedt and his stellar
+      work on pre-Islamic Arabian epigraphy for this idea, his own mapping of monotheist
+      inscriptions in pre-Islamic Arabia (from his <em>Muḥammad and His Followers in Context:
+      The Religious Map of Late Antique Arabia</em>) was the single most valuable source for
+      this project.
+    </p>
+  </div>
+</header>
+
+<!-- ======================================================================
+     Filters
+     ====================================================================== -->
+<div class="shell">
+  <div class="filters" data-filters role="group" aria-label="Filter inscriptions">
+    <div class="filters__status">
+      <span data-filter-status></span>
+      <button type="button" class="filters__reset" data-filter-reset hidden>Clear filters</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================================
+     Map + detail panel
+     ====================================================================== -->
+<main class="shell">
+  <div class="atlas atlas--closed" data-atlas>
+
+    <div class="map-frame" data-map-frame>
+      <svg class="map-svg" data-map-svg role="img"
+           aria-label="Map of Arabia and neighbouring regions showing the findspots of monotheistic inscriptions dated between about 400 and 630 CE."></svg>
+
+      <div class="map-tooltip" data-tooltip role="status" aria-live="polite"></div>
+
+      <div class="map-legend">
+        <div class="map-legend__title">Inscription type</div>
+        <div data-legend-items></div>
+      </div>
+
+      <div class="map-controls" role="group" aria-label="Map zoom">
+        <button type="button" data-zoom-in aria-label="Zoom in">+</button>
+        <button type="button" data-zoom-out aria-label="Zoom out">−</button>
+        <button type="button" data-zoom-reset aria-label="Reset the view">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 5.5V1.5h4M12.5 8.5v4h-4M12.5 5.5v-4h-4M1.5 8.5v4h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="map-empty" data-map-empty hidden>
+        <div class="map-empty__title">No inscriptions match</div>
+        <p class="map-empty__text">
+          That combination of filters leaves nothing on the map. Try widening one of them.
+        </p>
+        <button type="button" class="filters__reset" data-filter-clear-empty>Clear all filters</button>
+      </div>
+
+      <div class="map-attribution">Basemap: Natural Earth (public domain)</div>
+    </div>
+
+    <!-- Detail panel: filled by js/panel.js -->
+    <aside class="panel" data-panel hidden aria-label="Inscription details">
+      <div class="panel__head">
+        <button type="button" class="panel__close" data-panel-close aria-label="Close details">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div class="panel__kicker" data-panel-kicker></div>
+        <h2 class="panel__title" data-panel-title></h2>
+        <div class="panel__siglum" data-panel-siglum></div>
+      </div>
+      <div class="panel__body" data-panel-body></div>
+    </aside>
+
+  </div>
+</main>
+
+<!-- ======================================================================
+     Distribution
+     ====================================================================== -->
+<section class="section">
+  <div class="shell">
+    <div class="section__header">
+      <h2>What the Map Shows</h2>
+    </div>
+
+    <div class="stats" data-stats></div>
+
+    <div class="distribution">
+      <div class="chart-card">
+        <div class="chart-card__title">Records by region and affiliation</div>
+        <div class="chart-card__subtitle">Follows the filters above. Hover a segment for its count.</div>
+        <div data-chart></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================================================================
+     Bibliography
+     ====================================================================== -->
+<section class="section">
+  <div class="shell">
+    <div class="section__header">
+      <div class="section__eyebrow">Sources</div>
+      <h2>Bibliography</h2>
+    </div>
+
+    <ul class="bibliography">
+      <li>Alhatlani, Abdullah Saad, and Ajab Mohammad Al-Otibi. “A Palaeo-Arabic Inscription from the Ḥismā Desert (Tabūk Region).” <em>Arabian Archaeology and Epigraphy</em> 34, no. 1 (2023): 183–193. <a href="https://doi.org/10.1111/aae.12235" target="_blank" rel="noopener noreferrer">doi:10.1111/aae.12235</a></li>
+
+      <li>Al-Jallad, Ahmad. <em>The Religion and Rituals of the Nomads of Pre-Islamic Arabia: A Reconstruction Based on the Safaitic Inscriptions</em>. Leiden: Brill, 2022. <a href="https://doi.org/10.1163/9789004504271" target="_blank" rel="noopener noreferrer">doi:10.1163/9789004504271</a></li>
+
+      <li>Al-Jallad, Ahmad. “The Pre-Islamic Basmala: Reflections on Its First Epigraphic Attestation and Its Original Significance.” <em>Journal of the International Qurʾanic Studies Association</em> (2022). <a href="https://almuslih.org/wp-content/uploads/Library/Jallad,%20A%20-%20The%20pre-Islamic%20Basmala.pdf" target="_blank" rel="noopener noreferrer">PDF</a></li>
+
+      <li>Al-Jallad, Ahmad. <em>Ancient Allah: An Epigraphic Reconstruction</em>. 2025. <a href="https://www.academia.edu/129395185/Al_Jallad_2025_Ancient_Allah_An_Epigraphic_Reconstruction" target="_blank" rel="noopener noreferrer">Link</a></li>
+
+      <li>Al-Jallad, Ahmad, Ali al-Manaser, and Greg Fisher. “A Dated Paleo-Arabic Inscription Mentioning Al-Mundhir (ʾmndr) the King.” <em>Arabian Archaeology and Epigraphy</em> (2026). <a href="https://doi.org/10.1111/aae.70013" target="_blank" rel="noopener noreferrer">doi:10.1111/aae.70013</a></li>
+
+      <li>Al-Jallad, Ahmad, and Hythem Sidky. “A Paleo-Arabic Inscription on a Route North of Ṭāʾif.” <em>Arabian Archaeology and Epigraphy</em> 33, no. 1 (2022): 202–215. <a href="https://doi.org/10.1111/aae.12203" target="_blank" rel="noopener noreferrer">doi:10.1111/aae.12203</a></li>
+
+      <li>Al-Jallad, Ahmad, and Hythem Sidky. “A Paleo-Arabic Inscription of a Companion of Muhammad?” <em>Journal of Near Eastern Studies</em> 83, no. 1 (2024): 1–14. <a href="https://doi.org/10.1086/729531" target="_blank" rel="noopener noreferrer">doi:10.1086/729531</a></li>
+
+      <li>Athanassiadi, Polymnia, and Michael Frede, eds. <em>Pagan Monotheism in Late Antiquity</em>. Oxford: Oxford University Press, 1999.</li>
+
+      <li>Avanzini, Alessandra, ed. <em>Corpus of South Arabian Inscriptions</em>. Digital Archive for the Study of Pre-Islamic Arabian Inscriptions (DASI). <a href="https://dasi.cnr.it/" target="_blank" rel="noopener noreferrer">dasi.cnr.it</a></li>
+
+      <li>al-Bāriqī, Zāhir ʿĀṭif, and Christian Julien Robin. “Fragment of a Ḥimyarite Inscription Commissioned by King Abraha, with the Hypothetical Mention of Elephants.” 2025. <a href="https://www.academia.edu/145725998/" target="_blank" rel="noopener noreferrer">Link</a></li>
+
+      <li>Bellamy, James A. “Two Pre-Islamic Arabic Inscriptions Revised: Jabal Ramm and Umm al-Jimāl.” <em>Journal of the American Oriental Society</em> 108, no. 3 (1988): 369–378.</li>
+
+      <li>Bonnéric, Julie. “Archaeological Evidence of an Early Islamic Monastery in the Centre of al-Quṣūr (Failaka Island, Kuwait).” <em>Arabian Archaeology and Epigraphy</em> 32, no. 1 (2021): 153–171. <a href="https://doi.org/10.1111/aae.12182" target="_blank" rel="noopener noreferrer">doi:10.1111/aae.12182</a></li>
+
+      <li>Briquel Chatonnet, Françoise, George Kiraz, and Alessia Prioletta. “A First Syriac Inscription from the Area of Ḥimā (Najrān Province, Southern Saudi Arabia).” <em>Wiener Zeitschrift für die Kunde des Morgenlandes</em> 112 (2022): 37–49.</li>
+
+      <li>Carter, Robert. “Christianity in the Gulf during the First Centuries of Islam.” <em>Arabian Archaeology and Epigraphy</em> 19, no. 1 (2008): 71–108.</li>
+
+      <li>Fisher, Greg, ed. <em>Arabs and Empires before Islam</em>. Oxford: Oxford University Press, 2015.</li>
+
+      <li>Fisher, Greg. <em>Rome, Persia, and Arabia: Shaping the Middle East from Pompey to Muhammad</em>. London: Routledge, 2020.</li>
+
+      <li>Gajda, Iwona. <em>Le royaume de Ḥimyar à l’époque monothéiste: L’histoire de l’Arabie du Sud ancienne de la fin du IVe siècle de l’ère chrétienne jusqu’à l’avènement de l’islam</em>. Paris: De Boccard, 2009.</li>
+
+      <li>Gajda, Iwona. “Religions of Ancient South Arabia: From Polytheism to Monotheism in the Context of Political, Economic and Social Evolutions (Fourth–Sixth Centuries CE).” <em>Arabian Archaeology and Epigraphy</em> (2025). <a href="https://doi.org/10.1111/aae.70017" target="_blank" rel="noopener noreferrer">doi:10.1111/aae.70017</a></li>
+
+      <li>Gatier, Pierre-Louis. “Les graffites grecs de Mabrak an-Naqah (Arabie Saoudite).” <em>Cahiers du Centre Gustave Glotz</em> 31 (2020): 111–130.</li>
+
+      <li>Hoyland, Robert G. “Epigraphy and the Linguistic Background to the Qurʾān.” In <em>The Qurʾān in Its Historical Context</em>, edited by Gabriel S. Reynolds, 51–69. London: Routledge, 2008.</li>
+
+      <li>Hoyland, Robert G. “The Jews of the Hijaz in the Qurʾān and in Their Inscriptions.” In <em>New Perspectives on the Qurʾān</em>, edited by Gabriel S. Reynolds, 91–116. London: Routledge, 2011.</li>
+
+      <li>Insoll, Timothy, and Salman Al Mahari. <em>Excavations at Samahij, Bahrain</em>. University of Exeter and the Bahrain Authority for Culture and Antiquities, 2024. <a href="https://news.exeter.ac.uk/faculty-of-humanities-arts-and-social-sciences/archaeologists-discover-the-first-christian-building-in-bahrain/" target="_blank" rel="noopener noreferrer">Report</a></li>
+
+      <li>King, Geoffrey R. D. “A Nestorian Monastic Settlement on the Island of Ṣīr Banī Yās, Abu Dhabi.” <em>Bulletin of the School of Oriental and African Studies</em> 60, no. 2 (1997): 221–235.</li>
+
+      <li>Lindstedt, Ilkka. <em>Muḥammad and His Followers in Context: The Religious Map of Late Antique Arabia</em>. Leiden: Brill, 2024. <a href="https://doi.org/10.1163/9789004687134" target="_blank" rel="noopener noreferrer">doi:10.1163/9789004687134</a></li>
+
+      <li>Lindstedt, Ilkka. “A Map and List of the Monotheistic Inscriptions of Arabia, 400–600 CE.” <em>Hadis ve Siyer Araştırmaları</em> 10, no. 2 (2025): 275–283. <a href="https://www.hadithandsira.info/files/articles/dosya/10-2-7(1).pdf" target="_blank" rel="noopener noreferrer">PDF</a></li>
+
+      <li>Lindstedt, Ilkka. “Ethical Waṣiyyas on the Eve of Islam.” In <em>Crossing Ancient Sacred Landscapes: Contacts and Continuities in the Ancient Desert Cults and Beliefs of Northern Arabia and the Arid Southern Levant</em>, edited by Michael C. A. Macdonald and Juan Manuel Tebes. Oxford: Archaeopress, forthcoming.</li>
+
+      <li>Littmann, Enno. <em>Semitic Inscriptions</em>. Publications of the Princeton University Archaeological Expeditions to Syria, Division IV. Leiden: Brill, 1914–1949.</li>
+
+      <li>Macdonald, Michael C. A. “Arabs, Arabias, and Arabic before Late Antiquity.” <em>Topoi</em> 16 (2009): 277–332.</li>
+
+      <li>Nehmé, Laïla. “Epigraphy on the Edges of the Roman Empire: A Study of the Nabataean Inscriptions and Related Material from the Darb al-Bakrah, Saudi Arabia, 1st–5th Century AD.” Habilitation thesis, EPHE, Paris, 2013.</li>
+
+      <li>Nehmé, Laïla, ed. <em>The Darb al-Bakrah: A Caravan Route in North-West Arabia Discovered by Ali I. al-Ghabban. Catalogue of the Inscriptions</em>. Riyadh: Saudi Commission for Tourism and National Heritage, 2018.</li>
+
+      <li>Nehmé, Laïla. “The Religious Landscape of Northwest Arabia as Reflected in the Nabataean, Nabataeo-Arabic and Pre-Islamic Arabic Inscriptions.” <em>Semitica et Classica</em> 13 (2020): 127–154.</li>
+
+      <li>Nehmé, Laïla, ed. <em>DiCoNab: The Digital Corpus of the Nabataean and Developing Arabic Inscriptions</em>. 2024–. <a href="https://diconab.huma-num.fr/" target="_blank" rel="noopener noreferrer">diconab.huma-num.fr</a></li>
+
+      <li>Power, Timothy, et al. “A Newly Discovered Late Antique Monastery and Islamic Town on Sīnīya Island, Umm al-Quwain.” <em>Arabian Archaeology and Epigraphy</em> (2023). <a href="https://www.academia.edu/106784296/" target="_blank" rel="noopener noreferrer">Link</a></li>
+
+      <li>Robin, Christian Julien. “La réforme de l’écriture arabe à l’époque du califat médinois.” <em>Mélanges de l’Université Saint-Joseph</em> 59 (2006): 319–364.</li>
+
+      <li>Robin, Christian Julien. “Abraha et la reconquête de l’Arabie déserte: un réexamen de l’inscription Ryckmans 506 = Murayghān 1.” <em>Jerusalem Studies in Arabic and Islam</em> 39 (2012): 1–93.</li>
+
+      <li>Robin, Christian Julien. “Ḥimyar, Aksūm, and Arabia Deserta in Late Antiquity.” In <em>Arabs and Empires before Islam</em>, edited by Greg Fisher, 127–171. Oxford: Oxford University Press, 2015.</li>
+
+      <li>Robin, Christian Julien. “The Judaism of the Ancient Kingdom of Ḥimyar in Arabia: A Discreet Conversion.” In <em>Diversity and Rabbinization</em>, edited by Gavin McDowell et al. Cambridge: Open Book Publishers, 2021. <a href="https://books.openedition.org/obp/19970?lang=en" target="_blank" rel="noopener noreferrer">Open access</a></li>
+
+      <li>Robin, Christian Julien, ʿAlī b. Ibrāhīm al-Ghabbān, and Fāyiz al-Saʿīd. “Inscriptions antiques de la région de Najrān (Arabie séoudite méridionale): nouveaux jalons pour l’histoire de l’écriture, de la langue et du calendrier arabes.” <em>Comptes rendus de l’Académie des Inscriptions et Belles-Lettres</em> 158, no. 3 (2014): 1033–1128.</li>
+
+      <li>Sinai, Nicolai. <em>Rain-Giver, Bone-Breaker, Score-Settler: Allāh in Pre-Quranic Poetry</em>. New Haven: American Oriental Society, 2019. <a href="https://doi.org/10.5913/2019488259" target="_blank" rel="noopener noreferrer">doi:10.5913/2019488259</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======================================================================
+     Scripts. Order matters: vendor, then data, then config, then modules.
+     ====================================================================== -->
+<script src="js/vendor/d3.v7.min.js"></script>
+<script src="js/data/basemap.data.js"></script>
+<script src="js/data/inscriptions.data.js"></script>
+<script src="js/config.js"></script>
+<script src="js/map.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/tooltip.js"></script>
+<script src="js/panel.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
