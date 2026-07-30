@@ -77,6 +77,6 @@ Inscriptions of Arabia, 400–600 CE," *Hadis ve Siyer Araştırmaları* 10, no.
 [Digital Corpus of the Nabataean and Developing Arabic Inscriptions](https://diconab.huma-num.fr/)
 (ed. Laïla Nehmé) and the
 [Digital Archive for the Study of pre-Islamic Arabian Inscriptions](https://dasi.cnr.it/)
-(ed. Alessandra Avanzini). The full bibliography is at the bottom of the page.
+(ed. Alessandra Avanzini). The full bibliography is at the bottom of the page as I noted earlier.
 
 Basemap: [Natural Earth](https://www.naturalearthdata.com/), public domain.
