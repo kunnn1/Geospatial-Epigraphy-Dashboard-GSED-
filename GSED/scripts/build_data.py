@@ -1,23 +1,3 @@
-#!/usr/bin/env python3
-"""Build step for the Arabian epigraphy dashboard.
-
-Turns the hand-edited source data in ``data/inscriptions.json`` into the
-browser-ready files under ``js/data/``, and fetches the two external assets the
-page needs (a Natural Earth basemap and the D3 library) so that the finished
-dashboard runs completely offline.
-
-Run it from anywhere::
-
-    python3 scripts/build_data.py
-
-Only the Python standard library is used, so there is nothing to install.
-
-Why generate ``.data.js`` files instead of loading ``.json`` at runtime?
-Browsers block ``fetch()`` against ``file://`` URLs for security reasons. By
-emitting plain scripts that assign to a global, the dashboard can be opened by
-double-clicking ``index.html`` with no web server at all.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -28,9 +8,6 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-# --------------------------------------------------------------------------
-# Configuration
-# --------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SOURCE_DATA = PROJECT_ROOT / "data" / "inscriptions.json"
@@ -46,11 +23,9 @@ NATURAL_EARTH_URL = (
 )
 BASEMAP_CACHE = PROJECT_ROOT / "data" / ".cache_ne_50m_countries.geojson"
 
-# The map window: Arabia plus enough of its neighbours to give context.
-# (min longitude, min latitude, max longitude, max latitude)
+
 MAP_BBOX = (24.5, 5.5, 63.5, 37.5)
 
-# Countries drawn on the map. Natural Earth spells these in its ADMIN field.
 COUNTRIES_IN_VIEW = {
     "Saudi Arabia", "Yemen", "Oman", "United Arab Emirates", "Qatar",
     "Bahrain", "Kuwait", "Iraq", "Iran", "Jordan", "Israel", "Palestine",
@@ -60,14 +35,8 @@ COUNTRIES_IN_VIEW = {
     "Azerbaijan", "Georgia", "Libya", "Chad", "Kenya", "Uganda",
 }
 
-# Coordinate precision for the emitted basemap. Three decimal places is about
-# 100 m at this latitude - far finer than a continental map can show, and it
-# cuts the generated file to a fraction of the raw download.
 COORD_PRECISION = 3
 
-# --------------------------------------------------------------------------
-# Validation
-# --------------------------------------------------------------------------
 
 REQUIRED_FIELDS = (
     "id", "name", "siglum", "religion", "dateLabel", "language", "script",
@@ -85,11 +54,7 @@ class ValidationError(Exception):
 
 
 def validate_records(records: list[dict]) -> None:
-    """Fail loudly, naming the offending record, if the dataset is malformed.
-
-    A silent bad record would show up as a marker in the sea or a blank panel,
-    which is far harder to debug than an aborted build.
-    """
+   
     seen_ids: set[str] = set()
     min_lon, min_lat, max_lon, max_lat = MAP_BBOX
 
@@ -129,13 +94,7 @@ def validate_records(records: list[dict]) -> None:
                 raise ValidationError(f"{label}: a reference is missing its citation")
 
 
-# --------------------------------------------------------------------------
-# Facet derivation
-# --------------------------------------------------------------------------
 
-# Some records name several scripts at once ("Greek, Syriac and Paleo-Arabic").
-# The filter UI needs atomic values, so each record gains a list of the script
-# families it belongs to. A trilingual text legitimately answers to all three.
 SCRIPT_FAMILIES = (
     ("Paleo-Arabic", "Paleo-Arabic"),
     ("Nabataeo-Arabic", "Nabataeo-Arabic"),
@@ -146,7 +105,6 @@ SCRIPT_FAMILIES = (
     ("Hebrew", "Hebrew"),
 )
 
-# Materials are collapsed to a handful of buckets so the filter stays short.
 MATERIAL_BUCKETS = (
     ("sandstone", "Sandstone"),
     ("basalt", "Basalt"),
@@ -159,16 +117,11 @@ MATERIAL_BUCKETS = (
 
 
 def derive_facets(record: dict) -> dict:
-    """Add the normalised fields the filter UI sorts on.
-
-    ``scriptFacets`` is a list because a bilingual or trilingual inscription
-    belongs under more than one script heading; ``materialFacet`` is a single
-    bucket because a stone is only ever one kind of stone.
-    """
+  
     script_text = record["script"]
     facets = [label for needle, label in SCRIPT_FAMILIES if needle in script_text]
     if not facets:
-        # "None" for the architectural sites, which carry no text.
+        
         facets = ["Not applicable"]
     record["scriptFacets"] = facets
 
@@ -180,18 +133,6 @@ def derive_facets(record: dict) -> dict:
     return record
 
 
-# --------------------------------------------------------------------------
-# Basemap preparation
-# --------------------------------------------------------------------------
-
-def make_ssl_context() -> ssl.SSLContext:
-    """Return a verifying SSL context that also works on stock macOS Python.
-
-    Python installed from python.org does not wire itself into the macOS
-    keychain, so ``urlopen`` fails with CERTIFICATE_VERIFY_FAILED until the
-    bundled "Install Certificates" script is run. Where the ``certifi`` bundle
-    is present we use it, which keeps verification on rather than disabling it.
-    """
     context = ssl.create_default_context()
     if context.cert_store_stats().get("x509_ca", 0) == 0:
         try:
@@ -226,12 +167,7 @@ def download(url: str, destination: Path, description: str) -> None:
 
 
 def ring_intersects_bbox(ring: list) -> bool:
-    """True if any vertex of a polygon ring falls inside the map window.
 
-    This is a deliberately cheap test. It keeps distant overseas territories
-    (French Guiana filed under a European country, say) out of the basemap
-    without pulling in a geometry library.
-    """
     min_lon, min_lat, max_lon, max_lat = MAP_BBOX
     return any(
         min_lon <= point[0] <= max_lon and min_lat <= point[1] <= max_lat
@@ -241,23 +177,21 @@ def ring_intersects_bbox(ring: list) -> bool:
 
 
 def simplify_ring(ring: list) -> list:
-    """Round coordinates and drop points that collapse onto their neighbour."""
+
     simplified: list[list[float]] = []
     for point in ring:
         rounded = [round(point[0], COORD_PRECISION), round(point[1], COORD_PRECISION)]
         if not simplified or rounded != simplified[-1]:
             simplified.append(rounded)
-    # A polygon ring needs at least a triangle plus its closing point.
     return simplified if len(simplified) >= 4 else []
 
 
 def clip_feature(feature: dict) -> dict | None:
-    """Keep only the polygons of a country that appear in the map window."""
+
     geometry = feature.get("geometry") or {}
     geometry_type = geometry.get("type")
     coordinates = geometry.get("coordinates") or []
 
-    # Normalise Polygon into the MultiPolygon shape so one loop handles both.
     polygons = [coordinates] if geometry_type == "Polygon" else coordinates
 
     kept: list = []
@@ -294,12 +228,8 @@ def build_basemap() -> dict:
     return {"type": "FeatureCollection", "features": features}
 
 
-# --------------------------------------------------------------------------
-# Emitting
-# --------------------------------------------------------------------------
-
 def write_data_module(path: Path, global_name: str, payload: object, note: str) -> None:
-    """Write a payload as a plain script that assigns to ``window.<global_name>``."""
+
     path.parent.mkdir(parents=True, exist_ok=True)
     body = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     path.write_text(
@@ -327,7 +257,6 @@ def main() -> int:
 
     print("Building the Arabian epigraphy dashboard\n")
 
-    # 1. Source data --------------------------------------------------------
     print("Source data")
     if not SOURCE_DATA.exists():
         raise SystemExit(f"Missing {SOURCE_DATA}. Nothing to build.")
@@ -342,17 +271,14 @@ def main() -> int:
 
     records = [derive_facets(record) for record in records]
 
-    # 2. External assets ----------------------------------------------------
     print("\nExternal assets (first run only)")
     download(D3_URL, D3_LOCAL, "D3 v7")
     download(NATURAL_EARTH_URL, BASEMAP_CACHE, "Natural Earth 50m countries")
 
-    # 3. Basemap ------------------------------------------------------------
     print("\nBasemap")
     basemap = build_basemap()
     print(f"  clipped  {len(basemap['features'])} countries to {MAP_BBOX}")
 
-    # 4. Emit ---------------------------------------------------------------
     print("\nGenerated modules")
     write_data_module(
         JS_DATA_DIR / "inscriptions.data.js",
