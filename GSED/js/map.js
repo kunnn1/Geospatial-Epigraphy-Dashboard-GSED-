@@ -1,17 +1,3 @@
-/**
- * map.js - draws the map and its markers.
- *
- * Responsibilities, in order of the render pipeline:
- *   1. set up a projection fitted to the configured bounding box
- *   2. draw the static base layers (sea, graticule, land, borders)
- *   3. draw the labels (countries, water, deserts, settlements)
- *   4. draw one marker per inscription record
- *   5. keep everything in step with pan/zoom and with the filter state
- *
- * It knows nothing about the filter UI or the detail panel. It exposes a small
- * API and emits callbacks; main.js wires those to the other modules.
- */
-
 window.App = window.App || {};
 
 App.map = (function () {
@@ -19,7 +5,6 @@ App.map = (function () {
 
   const cfg = App.config;
 
-  /** Marker glyph size in screen pixels. Constant regardless of zoom. */
   const GLYPH_RADIUS = 6.5;
   const HIT_RADIUS = 13;
 
@@ -31,31 +16,19 @@ App.map = (function () {
   let selectedId = null;
   let callbacks = {};
 
-  // ------------------------------------------------------------------
-  // Geometry helpers
-  // ------------------------------------------------------------------
-
-  /**
-   * Build the SVG path for a category glyph, centred on (0, 0).
-   *
-   * Shape is a co-equal encoding with colour: it is what keeps the categories
-   * distinguishable for colour-blind readers and in greyscale print.
-   */
   function glyphPath(shape, r) {
     switch (shape) {
       case 'star': {
-        // Six-pointed star, drawn as two overlaid triangles.
         const h = r * 1.05;
         const up = `M0,${-h} L${h * 0.866},${h * 0.5} L${-h * 0.866},${h * 0.5} Z`;
         const down = `M0,${h} L${h * 0.866},${-h * 0.5} L${-h * 0.866},${-h * 0.5} Z`;
         return `${up} ${down}`;
       }
       case 'cross': {
-        // Latin cross with a slightly raised crossbar.
-        const a = r * 0.34;         // half the arm width
-        const v = r * 1.15;         // half height
-        const hArm = r * 0.92;      // half width
-        const bar = -r * 0.25;      // crossbar centre-line
+        const a = r * 0.34;         
+        const v = r * 1.15;         
+        const hArm = r * 0.92;      
+        const bar = -r * 0.25;      
         return [
           `M${-a},${-v}`, `L${a},${-v}`, `L${a},${bar - a}`,
           `L${hArm},${bar - a}`, `L${hArm},${bar + a}`, `L${a},${bar + a}`,
@@ -69,20 +42,12 @@ App.map = (function () {
       }
       case 'circle':
       default: {
-        // Two arcs make a full circle in a single path element.
         return `M${-r},0 A${r},${r} 0 1,0 ${r},0 A${r},${r} 0 1,0 ${-r},0`;
       }
     }
   }
 
-  /**
-   * Spread records that share a location so every one of them is hoverable.
-   *
-   * Several sites (Ḥimā, Mabrak al-Nāqa, the Ṭāʾif rock) carry more than one
-   * record. Without this they would stack into a single unclickable point.
-   * Members of a group are pushed onto a small circle around the true spot;
-   * the offset is in screen pixels so the cluster opens up as you zoom in.
-   */
+  
   function computeOffsets(items) {
     const groups = new Map();
     items.forEach((record) => {
@@ -106,7 +71,6 @@ App.map = (function () {
     });
   }
 
-  /** Screen position of a record under the current zoom transform. */
   function markerTransform(record) {
     const [x, y] = projection([record.lon, record.lat]);
     const px = x * currentTransform.k + currentTransform.x + (record._dx || 0);
@@ -114,9 +78,6 @@ App.map = (function () {
     return `translate(${px}, ${py})`;
   }
 
-  // ------------------------------------------------------------------
-  // Base layers
-  // ------------------------------------------------------------------
 
   function drawBase() {
     const basemap = window.BASEMAP_DATA;
@@ -131,7 +92,6 @@ App.map = (function () {
       .datum(d3.geoGraticule().step([5, 5])())
       .attr('d', geoPath);
 
-    // A pale outline just inside the coast, to soften the land/sea edge.
     layers.land.selectAll('path.map-coast-glow')
       .data(basemap.features)
       .join('path')
@@ -151,12 +111,8 @@ App.map = (function () {
       .attr('d', geoPath);
   }
 
-  // ------------------------------------------------------------------
-  // Labels
-  // ------------------------------------------------------------------
 
   function drawLabels() {
-    // Countries -------------------------------------------------------
     layers.labels.selectAll('text.map-label--country')
       .data(cfg.COUNTRIES)
       .join('text')
@@ -164,21 +120,18 @@ App.map = (function () {
       .attr('data-hide-below', (d) => d.hideBelow || 0)
       .text((d) => d.name);
 
-    // Water -----------------------------------------------------------
     layers.labels.selectAll('text.map-label--water')
       .data(cfg.WATER_LABELS)
       .join('text')
       .attr('class', (d) => `map-label map-label--water${d.small ? ' is-small' : ''}`)
       .text((d) => d.name);
 
-    // Deserts ---------------------------------------------------------
     layers.labels.selectAll('text.map-label--desert')
       .data(cfg.DESERT_LABELS)
       .join('text')
       .attr('class', (d) => `map-label map-label--desert${d.small ? ' is-small' : ''}`)
       .text((d) => d.name);
 
-    // Settlements: a dot plus its name --------------------------------
     const places = layers.places.selectAll('g.map-place')
       .data(cfg.PLACES)
       .join('g')
@@ -197,12 +150,6 @@ App.map = (function () {
       .text((d) => d.name);
   }
 
-  /**
-   * Reposition every label for the current transform.
-   *
-   * Labels are drawn in screen space rather than being scaled with the map, so
-   * that text stays the same size and stays readable at every zoom level.
-   */
   function positionLabels() {
     const place = (selection) => selection.attr('transform', (d) => {
       const [x, y] = projection([d.lon, d.lat]);
@@ -223,9 +170,6 @@ App.map = (function () {
         (d.minZoom && currentTransform.k < d.minZoom ? 'none' : null));
   }
 
-  // ------------------------------------------------------------------
-  // Markers
-  // ------------------------------------------------------------------
 
   function drawMarkers() {
     computeOffsets(records);
@@ -239,7 +183,6 @@ App.map = (function () {
           .attr('role', 'button')
           .attr('aria-label', (d) => `${d.name}, ${d.dateLabel}`);
 
-        // Halo first so it sits beneath the glyph.
         g.append('circle')
           .attr('class', 'marker__halo')
           .attr('r', GLYPH_RADIUS + 4.5);
@@ -248,7 +191,6 @@ App.map = (function () {
           .attr('class', 'marker__glyph')
           .attr('d', (d) => glyphPath(cfg.CATEGORIES[d.religion].shape, GLYPH_RADIUS));
 
-        // Count badge for the multi-text records.
         const multi = g.filter((d) => d.textCount > 1);
         multi.append('circle')
           .attr('class', 'marker__count-bg')
@@ -261,7 +203,6 @@ App.map = (function () {
           .attr('y', -GLYPH_RADIUS - 1.5)
           .text((d) => `${d.textCount}`);
 
-        // Transparent hit area last, so it is on top and catches the pointer.
         g.append('circle')
           .attr('class', 'marker__hit')
           .attr('r', HIT_RADIUS);
@@ -300,10 +241,6 @@ App.map = (function () {
     if (markerSelection) markerSelection.attr('transform', markerTransform);
   }
 
-  // ------------------------------------------------------------------
-  // Zoom
-  // ------------------------------------------------------------------
-
   function onZoom(event) {
     currentTransform = event.transform;
     layers.world.attr('transform', event.transform);
@@ -312,24 +249,9 @@ App.map = (function () {
     if (callbacks.onZoom) callbacks.onZoom(currentTransform);
   }
 
-  // ------------------------------------------------------------------
-  // Sizing
-  // ------------------------------------------------------------------
-
-  /**
-   * A winding-free description of the map window, used to fit the projection.
-   *
-   * A GeoJSON Polygon cannot be used for this. d3-geo interprets polygon rings
-   * on the sphere, where a ring's winding decides which side is "inside"; a
-   * plain four-corner box is read as the whole sphere minus the box, which
-   * collapses the fitted scale to almost nothing. A MultiPoint has no interior
-   * and so no winding to get wrong. Sampling along the edges rather than just
-   * taking the four corners matters too, because the conic projection bows the
-   * parallels and the mid-edge points sit outside the corner-to-corner box.
-   */
   function windowFitObject() {
     const [[west, south], [east, north]] = cfg.BBOX;
-    const STEP = 1;                       // degrees between samples
+    const STEP = 1;                       
     const points = [];
     for (let lon = west; lon <= east; lon += STEP) {
       points.push([lon, south], [lon, north]);
@@ -349,10 +271,8 @@ App.map = (function () {
     height = rect.height;
     svg.attr('viewBox', `0 0 ${width} ${height}`);
 
-    // Fit the configured map window into the frame, with a little padding.
     projection.fitExtent([[14, 14], [width - 14, height - 14]], windowFitObject());
 
-    // Redraw the geometry that depends on the projection.
     layers.land.selectAll('path').attr('d', geoPath);
     layers.borders.selectAll('path').attr('d', geoPath);
     layers.graticule.selectAll('path').attr('d', geoPath);
@@ -361,9 +281,6 @@ App.map = (function () {
     positionMarkers();
   }
 
-  // ------------------------------------------------------------------
-  // Public API
-  // ------------------------------------------------------------------
 
   function init(options) {
     records = options.records;
@@ -371,9 +288,6 @@ App.map = (function () {
 
     svg = d3.select(options.svg);
 
-    // A conic equal-area projection centred on the peninsula. Equal-area
-    // matters on a distribution map: it keeps the visual weight of a cluster
-    // proportional to the ground it actually covers.
     projection = d3.geoConicEqualArea()
       .parallels([12, 32])
       .rotate([-44, 0])
@@ -381,8 +295,6 @@ App.map = (function () {
 
     geoPath = d3.geoPath(projection);
 
-    // Layer order is paint order. `world` scales with the zoom transform;
-    // labels and markers are positioned manually in screen space.
     layers = {};
     layers.sea = svg.append('g').attr('class', 'layer-sea');
     layers.world = svg.append('g').attr('class', 'layer-world');
@@ -399,7 +311,6 @@ App.map = (function () {
 
     svg.call(zoomBehaviour);
 
-    // Clicking empty map dismisses the current selection.
     svg.on('click', () => {
       if (callbacks.onSelect) callbacks.onSelect(null);
     });
@@ -408,12 +319,10 @@ App.map = (function () {
     drawBase();
     drawLabels();
     drawMarkers();
-    resize();   // once more, now that labels exist and can be positioned
-
+    resize();  
     window.addEventListener('resize', debounce(resize, 150));
   }
 
-  /** Dim the markers that the current filter excludes. */
   function applyFilter(visibleIds) {
     if (!markerSelection) return;
     markerSelection.classed('is-muted', (d) => !visibleIds.has(d.id));
@@ -432,7 +341,6 @@ App.map = (function () {
     svg.transition().duration(420).call(zoomBehaviour.transform, d3.zoomIdentity);
   }
 
-  /** Pan and zoom so a given record sits in the middle of the frame. */
   function focusOn(record, scale) {
     const [x, y] = projection([record.lon, record.lat]);
     const k = scale || Math.max(currentTransform.k, 2.6);
