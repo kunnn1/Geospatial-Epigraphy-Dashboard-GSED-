@@ -1,10 +1,3 @@
-/**
- * tooltip.js - the hover card.
- *
- * Deliberately minimal: name, dating, category. Everything else waits for a
- * click, so that skimming the map stays fast and uncluttered.
- */
-
 window.App = window.App || {};
 
 App.tooltip = (function () {
@@ -17,12 +10,6 @@ App.tooltip = (function () {
     frame = options.frame;
   }
 
-  /**
-   * Show the card for `record`, positioned near `targetNode`.
-   *
-   * The card is placed in the frame's coordinate space and flipped to the
-   * other side of the marker when it would otherwise overflow the frame.
-   */
   function show(record, targetNode) {
     const category = App.config.CATEGORIES[record.religion];
 
@@ -38,7 +25,6 @@ App.tooltip = (function () {
 
     element.classList.add('is-visible');
 
-    // Measure after the content is in place, so the flip test uses real width.
     const frameRect = frame.getBoundingClientRect();
     const markerRect = targetNode.getBoundingClientRect();
     const cardRect = element.getBoundingClientRect();
