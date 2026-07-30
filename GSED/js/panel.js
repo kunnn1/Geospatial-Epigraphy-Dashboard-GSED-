@@ -1,13 +1,3 @@
-/**
- * panel.js - the expanded record view.
- *
- * Opens when a marker is clicked and shows everything the dataset holds for
- * that inscription: dating, readings, provenance, script, physical details and
- * further reading. Fields with no published value say so rather than being
- * hidden, because "no dimensions were ever published" is itself information
- * about how this material was recorded.
- */
-
 window.App = window.App || {};
 
 App.panel = (function () {
@@ -33,7 +23,6 @@ App.panel = (function () {
     });
   }
 
-  /** Build the physical / classificatory field list. */
   function renderFields(record) {
     const precisionText = {
       exact: 'Exact coordinates published',
