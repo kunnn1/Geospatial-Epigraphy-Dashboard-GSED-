@@ -31,7 +31,7 @@ Below the map, is the "What This Map Shows" section that is basically a table th
 
 Also included a light and dark mode for a better personalized experience: Parchment = Light Mode and Ink = Dark Mode
 
-Special thanks to Terron, and Tracy, and Jack for advising me during the process of building GSED.
+Special thanks to Ayush, and Tracy, and Jack for advising me during the process of building GSED.
 
 ## The Data Model
 
