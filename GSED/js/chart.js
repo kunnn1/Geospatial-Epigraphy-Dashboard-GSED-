@@ -1,15 +1,3 @@
-/**
- * chart.js - the distribution chart under the map.
- *
- * A horizontal stacked bar per region, split by affiliation. Horizontal because
- * the category names are long ("Eastern Arabia & the Gulf" will not fit under a
- * vertical bar); stacked because the question it answers is "what is the mix in
- * each region", and the regional total matters as much as the split.
- *
- * The chart follows the current filter, so it doubles as a readout of what is
- * on the map at any moment.
- */
-
 window.App = window.App || {};
 
 App.chart = (function () {
@@ -43,10 +31,7 @@ App.chart = (function () {
 
   let currentRecords = [];
 
-  /**
-   * Aggregate into one row per region, each row holding a count per category.
-   * Regions are ordered by total so the chart reads top-down as a ranking.
-   */
+
   function aggregate(records) {
     const byRegion = new Map();
 
@@ -89,7 +74,6 @@ App.chart = (function () {
 
     const plot = svg.append('g').attr('transform', `translate(${MARGIN.left}, ${MARGIN.top})`);
 
-    // --- axis: a recessive baseline plus sparse ticks --------------------
     const axisY = rows.length * (ROW_HEIGHT + ROW_GAP);
     const ticks = x.ticks(Math.min(6, maxTotal));
 
@@ -116,14 +100,12 @@ App.chart = (function () {
       .style('font-variant-numeric', 'tabular-nums')
       .text((d) => d);
 
-    // --- rows ------------------------------------------------------------
     const row = plot.selectAll('g.chart-row')
       .data(rows)
       .join('g')
       .attr('class', 'chart-row')
       .attr('transform', (d, i) => `translate(0, ${i * (ROW_HEIGHT + ROW_GAP)})`);
 
-    // Region name, right-aligned into the left margin.
     row.append('text')
       .attr('x', -10)
       .attr('y', ROW_HEIGHT / 2)
@@ -134,7 +116,6 @@ App.chart = (function () {
       .attr('font-size', 11)
       .text((d) => d.region);
 
-    // Stacked segments, in the fixed category order.
     row.each(function (rowDatum) {
       const group = d3.select(this);
       let offset = 0;
@@ -152,8 +133,7 @@ App.chart = (function () {
           .attr('y', 0)
           .attr('width', segmentWidth)
           .attr('height', ROW_HEIGHT)
-          // Round only the outer ends of the whole bar, so the stack reads as
-          // one object rather than a row of separate pills.
+          
           .attr('rx', isFirst || isLast ? BAR_RADIUS : 0)
           .attr('fill', `var(--cat-${categoryId})`)
           .style('cursor', 'default')
@@ -162,7 +142,6 @@ App.chart = (function () {
           })
           .on('pointerleave', hideTooltip);
 
-        // Square off the inner corners that rx just rounded.
         if (isFirst && !isLast && segmentWidth > BAR_RADIUS) {
           group.append('rect')
             .attr('x', x(offset) + segmentWidth - BAR_RADIUS)
@@ -181,8 +160,7 @@ App.chart = (function () {
         offset += count;
       });
 
-      // Total at the end of the bar - a direct label, so the chart is readable
-      // without hovering and without a value on every segment.
+  
       group.append('text')
         .attr('x', x(rowDatum.total) + 7)
         .attr('y', ROW_HEIGHT / 2)
