@@ -1,30 +1,12 @@
-/**
- * config.js - every value the dashboard tunes, in one place.
- *
- * Nothing here draws anything. Keeping the map window, the gazetteer of place
- * labels and the category definitions separate from the rendering code means
- * you can retitle a city or recolour a category without opening map.js.
- */
-
 window.App = window.App || {};
 
 App.config = (function () {
   'use strict';
 
-  /**
-   * The geographic window, as [[west, south], [east, north]].
-   * Must match MAP_BBOX in scripts/build_data.py, which clips the basemap.
-   */
+  
   const BBOX = [[24.5, 5.5], [63.5, 37.5]];
 
-  /**
-   * Inscription categories.
-   *
-   * Colour alone never carries the distinction: each category also has its own
-   * glyph shape. That pairing is what lets the palette sit in the 6-8 CVD
-   * separation band safely, and it keeps the map readable in greyscale.
-   * Palette validated against both page surfaces with the dataviz validator.
-   */
+
   const CATEGORIES = {
     jewish: {
       id: 'jewish',
@@ -52,23 +34,10 @@ App.config = (function () {
     }
   };
 
-  /** Draw order, which is also the legend order and the filter order. */
   const CATEGORY_ORDER = ['jewish', 'christian', 'monotheist', 'christian-context'];
 
-  /**
-   * Places labelled on the map.
-   *
-   * tier 'ancient'  - settlements that mattered in the 5th-7th centuries.
-   * tier 'modern'   - present-day cities, included purely for orientation and
-   *                   styled so they read as secondary. Riyadh and Dubai are
-   *                   here to help you find yourself, not because they existed.
-   *
-   * `minZoom` hides a label until the map is zoomed in far enough, which is how
-   * the map stays legible at first sight while still rewarding exploration.
-   * `anchor` nudges a label off its dot when neighbours would collide.
-   */
+ 
   const PLACES = [
-    // --- Ancient / late antique -------------------------------------------
     { name: 'Makkah', lat: 21.42, lon: 39.83, tier: 'ancient', anchor: 'end' },
     { name: 'Yathrib (Madinah)', lat: 24.47, lon: 39.61, tier: 'ancient', anchor: 'end' },
     { name: 'Ṭāʾif', lat: 21.27, lon: 40.42, tier: 'ancient', anchor: 'start' },
@@ -92,7 +61,6 @@ App.config = (function () {
     { name: 'Aksum', lat: 14.13, lon: 38.72, tier: 'ancient', anchor: 'end' },
     { name: 'Adulis', lat: 15.26, lon: 39.66, tier: 'ancient', anchor: 'start', minZoom: 1.8 },
 
-    // --- Modern, for orientation only -------------------------------------
     { name: 'Riyadh', lat: 24.71, lon: 46.68, tier: 'modern', anchor: 'start' },
     { name: 'Jeddah', lat: 21.49, lon: 39.19, tier: 'modern', anchor: 'end', dy: 14 },
     { name: 'Abha', lat: 18.22, lon: 42.51, tier: 'modern', anchor: 'end' },
@@ -112,10 +80,7 @@ App.config = (function () {
     { name: 'Shiraz', lat: 29.59, lon: 52.58, tier: 'modern', anchor: 'start', minZoom: 1.8 }
   ];
 
-  /**
-   * Country labels. Positioned by hand rather than at polygon centroids, which
-   * for a shape like Saudi Arabia or Egypt lands the text in an awkward place.
-   */
+
   const COUNTRIES = [
     { name: 'SAUDI ARABIA', lat: 23.20, lon: 44.20 },
     { name: 'YEMEN', lat: 15.60, lon: 47.60 },
@@ -137,7 +102,6 @@ App.config = (function () {
     { name: 'SOMALIA', lat: 9.20, lon: 47.50 }
   ];
 
-  /** Seas, gulfs and one desert. Rendered in spaced italics, atlas-style. */
   const WATER_LABELS = [
     { name: 'Red Sea', lat: 20.20, lon: 38.30, rotate: -46 },
     { name: 'Persian Gulf', lat: 27.30, lon: 51.20, rotate: -34 },
@@ -153,7 +117,6 @@ App.config = (function () {
     { name: 'ḤISMĀ', lat: 29.10, lon: 36.40, rotate: -20, small: true }
   ];
 
-  /** Filter dimensions, in the order they appear in the filter bar. */
   const FILTERS = [
     { key: 'religion', label: 'Affiliation', accessor: (r) => [r.religion], display: (v) => (CATEGORIES[v] ? CATEGORIES[v].label : v) },
     { key: 'script', label: 'Script', accessor: (r) => r.scriptFacets },
@@ -161,7 +124,6 @@ App.config = (function () {
     { key: 'material', label: 'Material', accessor: (r) => [r.materialFacet] }
   ];
 
-  /** Zoom limits for d3.zoom. 1 is "fitted to the container". */
   const ZOOM_EXTENT = [1, 12];
 
   return {
