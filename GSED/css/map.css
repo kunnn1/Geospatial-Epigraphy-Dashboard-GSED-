@@ -1,11 +1,3 @@
-/* ==========================================================================
-   map.css - the cartography.
-
-   The map is a single SVG built by js/map.js. Everything visual about it is
-   controlled here, so the drawing code can stay concerned with geometry and
-   leave appearance to CSS. Colours all come from the tokens in main.css.
-   ========================================================================== */
-
 .map-frame {
   position: relative;
   background: var(--sea);
@@ -13,19 +5,7 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  /* An explicit height rather than an aspect-ratio: the frame should take the
-     column width and let only its height answer to the viewport. (aspect-ratio
-     plus max-height would shrink the width too, since the browser preserves the
-     ratio when it clamps the height.) The projection refits to whatever box it
-     is given, so any size here is safe.
-
-     The width cap matters for composition: the mapped region is roughly as tall
-     as it is wide, so on a wide monitor an uncapped frame fits the map by
-     height and leaves the inscriptions huddled in a narrow central band.
-
-     The frame is a grid item, so the width is set explicitly and centred with
-     justify-self. Using `margin-inline: auto` here instead would switch the
-     item from stretch to shrink-to-fit and collapse it onto its own content. */
+  
   height: clamp(480px, 80vh, 860px);
   width: min(100%, 1040px);
   justify-self: center;
@@ -39,14 +19,10 @@
   display: block;
   width: 100%;
   height: 100%;
-  touch-action: none;         /* let d3.zoom own the gestures */
+  touch-action: none;         
   cursor: grab;
 }
 .map-svg:active { cursor: grabbing; }
-
-/* --------------------------------------------------------------------------
-   Base layers
-   -------------------------------------------------------------------------- */
 
 .map-sea { fill: var(--sea); }
 
@@ -62,9 +38,6 @@
   stroke: none;
 }
 
-/* Modern national borders, drawn as a light dashed hairline. They are an
-   anachronism on a map of late antiquity, so they are styled to read as a
-   reference grid rather than as historical information. */
 .map-border {
   fill: none;
   stroke: var(--rule-strong);
@@ -74,7 +47,6 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* A soft halo where land meets sea, in the manner of engraved atlases. */
 .map-coast-glow {
   fill: none;
   stroke: var(--land);
@@ -83,14 +55,11 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* --------------------------------------------------------------------------
-   Labels
-   -------------------------------------------------------------------------- */
 
 .map-label {
   pointer-events: none;
   user-select: none;
-  paint-order: stroke fill;    /* halo behind the glyphs, never over them */
+  paint-order: stroke fill;    
 }
 
 .map-label--country {
@@ -131,9 +100,6 @@
 }
 .map-label--desert.is-small { font-size: 8px; letter-spacing: 0.2em; }
 
-/* Settlements. Ancient places are the subject of the map, so they get the
-   serif face and full contrast; modern cities are orientation aids and are
-   deliberately quieter. */
 .map-place-dot { fill: var(--ink-3); }
 .map-place-dot--ancient { fill: var(--ink-2); }
 
@@ -157,14 +123,10 @@
   dominant-baseline: middle;
 }
 
-/* --------------------------------------------------------------------------
-   Inscription markers
-   -------------------------------------------------------------------------- */
 
 .marker {
   cursor: pointer;
-  /* The transition is on opacity only. Transforms are recomputed on zoom, and
-     animating them would make panning feel laggy. */
+
   transition: opacity var(--transition);
 }
 
@@ -175,7 +137,6 @@
   transition: fill var(--transition);
 }
 
-/* Category fills. The shape differs too - see js/map.js glyphPath(). */
 .marker--jewish            .marker__glyph { fill: var(--cat-jewish); }
 .marker--christian         .marker__glyph { fill: var(--cat-christian); }
 .marker--monotheist        .marker__glyph { fill: var(--cat-monotheist); }
@@ -185,10 +146,8 @@
   stroke-width: 2;
 }
 
-/* An invisible, generous hit area so small glyphs stay easy to hit. */
 .marker__hit { fill: transparent; stroke: none; }
 
-/* A ring that appears under the glyph on hover and selection. */
 .marker__halo {
   fill: none;
   stroke: var(--ink);
@@ -201,7 +160,6 @@
 
 .marker.is-selected .marker__glyph { stroke-width: 2.2; }
 
-/* Count badge for markers that stand for several texts (x12, x23). */
 .marker__count {
   font-family: var(--font-sans);
   font-size: 7.5px;
@@ -213,13 +171,7 @@
 }
 .marker__count-bg { fill: var(--ink); }
 
-/* Filtered-out markers stay on the map but recede, so you can see what your
-   filter removed rather than watching points vanish into nothing. */
 .marker.is-muted { opacity: 0.1; pointer-events: none; }
-
-/* --------------------------------------------------------------------------
-   Tooltip
-   -------------------------------------------------------------------------- */
 
 .map-tooltip {
   position: absolute;
@@ -272,9 +224,6 @@
   color: var(--ink-3);
 }
 
-/* --------------------------------------------------------------------------
-   Map chrome: legend, zoom controls, attribution
-   -------------------------------------------------------------------------- */
 
 .map-legend {
   position: absolute;
@@ -354,7 +303,6 @@
   opacity: 0.7;
 }
 
-/* Shown when a filter combination matches nothing. */
 .map-empty {
   position: absolute;
   inset: 0;
