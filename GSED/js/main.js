@@ -1,20 +1,8 @@
-/**
- * main.js - boot sequence and wiring.
- *
- * The other modules are deliberately unaware of each other. This file is the
- * only place that knows the map should dim its markers when the filter changes,
- * or that clicking a marker opens the panel. Keeping that knowledge in one
- * place is what makes the modules replaceable.
- */
-
 (function () {
   'use strict';
 
   const App = window.App;
 
-  // ------------------------------------------------------------------
-  // Theme
-  // ------------------------------------------------------------------
 
   const THEME_KEY = 'arabia-epigraphy-theme';
 
@@ -44,9 +32,6 @@
     });
   }
 
-  // ------------------------------------------------------------------
-  // Legend
-  // ------------------------------------------------------------------
 
   function buildLegend(records) {
     const list = document.querySelector('[data-legend-items]');
@@ -65,10 +50,6 @@
         </div>`;
     }).join('');
   }
-
-  // ------------------------------------------------------------------
-  // Headline statistics
-  // ------------------------------------------------------------------
 
   function buildStats(records) {
     const node = document.querySelector('[data-stats]');
@@ -90,9 +71,6 @@
       </div>`).join('');
   }
 
-  // ------------------------------------------------------------------
-  // Boot
-  // ------------------------------------------------------------------
 
   function start() {
     if (typeof d3 === 'undefined' || !window.INSCRIPTION_DATA || !window.BASEMAP_DATA) {
@@ -163,7 +141,6 @@
       }
     });
 
-    // Zoom controls
     document.querySelector('[data-zoom-in]').addEventListener('click', () => App.map.zoomBy(1.5));
     document.querySelector('[data-zoom-out]').addEventListener('click', () => App.map.zoomBy(1 / 1.5));
     document.querySelector('[data-zoom-reset]').addEventListener('click', () => App.map.resetZoom());
