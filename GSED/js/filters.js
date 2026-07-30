@@ -1,15 +1,3 @@
-/**
- * filters.js - the filter bar.
- *
- * Four independent dimensions (affiliation, script, region, material). Within
- * a dimension the selected values are OR-ed; across dimensions they are AND-ed.
- * That is the behaviour people expect: ticking "Jewish" and "Christian" widens
- * the result, ticking "Jewish" and "Syriac" narrows it.
- *
- * The module owns the filter state and tells its listener when it changes. It
- * does not touch the map or the chart directly.
- */
-
 window.App = window.App || {};
 
 App.filters = (function () {
@@ -21,20 +9,13 @@ App.filters = (function () {
   let resetNode;
   let onChange = null;
 
-  /** dimension key -> Set of selected values. An empty Set means "all". */
   const state = new Map();
 
-  // ------------------------------------------------------------------
-  // Predicate
-  // ------------------------------------------------------------------
-
-  /** True if `record` satisfies every dimension's current selection. */
   function matches(record) {
     return App.config.FILTERS.every((dimension) => {
       const selected = state.get(dimension.key);
       if (!selected || selected.size === 0) return true;
-      // A record can carry several values in one dimension (a trilingual text
-      // has three scripts), so it passes if any of them is selected.
+  
       return dimension.accessor(record).some((value) => selected.has(value));
     });
   }
@@ -43,16 +24,6 @@ App.filters = (function () {
     return records.filter(matches);
   }
 
-  // ------------------------------------------------------------------
-  // Counts
-  // ------------------------------------------------------------------
-
-  /**
-   * How many records an option would yield, given every OTHER dimension's
-   * current selection. Counting this way means the numbers beside the options
-   * tell you what will happen if you click, rather than restating what you
-   * have already chosen.
-   */
   function tallyFor(dimension, value) {
     return records.filter((record) => {
       if (!dimension.accessor(record).includes(value)) return false;
@@ -65,22 +36,17 @@ App.filters = (function () {
     }).length;
   }
 
-  /** Every distinct value in a dimension, ordered for display. */
   function optionsFor(dimension) {
     const values = new Set();
     records.forEach((record) => dimension.accessor(record).forEach((v) => values.add(v)));
 
     const list = [...values];
     if (dimension.key === 'religion') {
-      // Keep the legend's order rather than sorting alphabetically.
       return App.config.CATEGORY_ORDER.filter((id) => values.has(id));
     }
     return list.sort((a, b) => a.localeCompare(b));
   }
 
-  // ------------------------------------------------------------------
-  // Rendering
-  // ------------------------------------------------------------------
 
   const CHECK_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 6.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const CHEVRON_SVG = '<svg class="chev" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -103,7 +69,6 @@ App.filters = (function () {
 
     wrapper.append(button, menu);
 
-    // --- open / close -------------------------------------------------
     button.addEventListener('click', (event) => {
       event.stopPropagation();
       const isOpen = button.getAttribute('aria-expanded') === 'true';
@@ -149,7 +114,7 @@ App.filters = (function () {
       option.addEventListener('click', () => {
         if (selected.has(value)) selected.delete(value);
         else selected.add(value);
-        renderMenu(dimension, menu);   // refresh tallies in place
+        renderMenu(dimension, menu);   
         emit();
       });
 
@@ -164,7 +129,6 @@ App.filters = (function () {
     });
   }
 
-  /** Refresh the button labels, the badge counts and the status line. */
   function paintChrome() {
     container.querySelectorAll('.filter').forEach((wrapper) => {
       const dimension = wrapper._dimension;
@@ -194,10 +158,6 @@ App.filters = (function () {
     emit();
   }
 
-  // ------------------------------------------------------------------
-  // Public API
-  // ------------------------------------------------------------------
-
   function init(options) {
     records = options.records;
     container = options.container;
@@ -210,7 +170,6 @@ App.filters = (function () {
       container.appendChild(buildDimension(dimension));
     });
 
-    // Move the status block to the end so it sits right of the controls.
     container.appendChild(statusNode.parentNode);
 
     resetNode.addEventListener('click', reset);
