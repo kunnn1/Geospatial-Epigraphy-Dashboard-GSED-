@@ -1,19 +1,4 @@
-/* ==========================================================================
-   main.css - design tokens, page layout, typography, panels, filters, prose.
-   Cartographic styling lives in map.css.
-
-   Theming works through custom properties only. Every colour in the project
-   is declared twice below - once for "parchment" (light) and once for "ink"
-   (dark) - and nothing further down the file hard-codes a colour. Adding a
-   third theme would mean adding one more block here and nothing else.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Tokens
-   -------------------------------------------------------------------------- */
-
 :root {
-  /* Type scale: a serif for reading and display, a sans for UI chrome. */
   --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
                 Georgia, "Times New Roman", serif;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -42,23 +27,21 @@
 
   color-scheme: light;
 
-  /* --- Parchment (light) ------------------------------------------------ */
-  --paper:        #efe4cd;   /* page plane */
-  --surface:      #f2e8d5;   /* cards - the validated light surface */
-  --surface-2:    #e8dbc0;   /* raised chrome: filter bar, panel */
-  --surface-3:    #ded0b2;   /* wells and hovers */
-  --land:         #f2e8d5;   /* map land; must read clearly against --sea */
+  --paper:        #efe4cd;   
+  --surface:      #f2e8d5;   
+  --surface-2:    #e8dbc0;   
+  --surface-3:    #ded0b2;   
+  --land:         #f2e8d5;   
   --sea:          #cfd8d4;
 
-  --ink:          #241d12;   /* primary text */
-  --ink-2:        #57493a;   /* secondary text */
-  --ink-3:        #857761;   /* muted text, axis labels */
+  --ink:          #241d12;   
+  --ink-2:        #57493a;   
+  --ink-3:        #857761;   
 
-  --rule:         #cbbb9c;   /* hairlines */
+  --rule:         #cbbb9c;   
   --rule-strong:  #a89a7d;
 
-  /* Category colours - validated on --surface with the dataviz validator.
-     Shape is the co-equal encoding; see config.js CATEGORIES. */
+  
   --cat-jewish:            #1c5cab;
   --cat-christian:         #c25a1e;
   --cat-monotheist:        #a63a86;
@@ -74,10 +57,7 @@
   --grain-opacity: 0.045;
 }
 
-/* --- Ink (dark) --------------------------------------------------------- */
-/* Declared under both the OS media query and the explicit toggle, so the
-   toggle wins in both directions. The :not() guard lets a light stamp beat
-   OS-dark; :where() keeps the media block's specificity at zero. */
+
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
@@ -162,8 +142,7 @@ body {
   transition: background-color var(--transition), color var(--transition);
 }
 
-/* A faint fibre texture over the whole page. Pointer-events off so it never
-   intercepts a click; it is decoration only. */
+
 body::before {
   content: "";
   position: fixed;
@@ -200,16 +179,12 @@ a:hover { color: var(--accent); }
   white-space: nowrap;
 }
 
-/* --------------------------------------------------------------------------
-   3. Masthead
-   -------------------------------------------------------------------------- */
 
 .masthead {
   padding: clamp(2rem, 5vw, 3.5rem) 0 var(--space-5);
   border-bottom: 1px solid var(--rule);
 }
 
-/* Title left, theme toggle top-right, aligned to the first line of the title. */
 .masthead__inner {
   display: flex;
   align-items: flex-start;
@@ -252,9 +227,6 @@ a:hover { color: var(--accent); }
 .theme-toggle:hover { background: var(--surface-3); color: var(--ink); }
 .theme-toggle svg { width: 15px; height: 15px; }
 
-/* --------------------------------------------------------------------------
-   4. Filter bar
-   -------------------------------------------------------------------------- */
 
 .filters {
   position: sticky;
@@ -300,7 +272,6 @@ a:hover { color: var(--accent); }
 .filter__button .chev { transition: transform var(--transition); }
 .filter__button[aria-expanded="true"] .chev { transform: rotate(180deg); }
 
-/* The little count badge that appears once a dimension is narrowed. */
 .filter__count {
   display: inline-grid;
   place-items: center;
@@ -405,10 +376,6 @@ a:hover { color: var(--accent); }
 .filters__reset:hover { color: var(--ink); }
 .filters__reset[hidden] { display: none; }
 
-/* --------------------------------------------------------------------------
-   5. Map + detail panel layout
-   -------------------------------------------------------------------------- */
-
 .atlas {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -416,8 +383,7 @@ a:hover { color: var(--accent); }
   margin: var(--space-5) 0 var(--space-7);
 }
 
-/* Once there is room, the detail panel docks beside the map instead of
-   overlaying it, so you can read a record and keep its context in view. */
+
 @media (min-width: 1080px) {
   .atlas { grid-template-columns: minmax(0, 1fr) 380px; }
   .atlas--closed { grid-template-columns: minmax(0, 1fr) 0; }
@@ -428,9 +394,6 @@ a:hover { color: var(--accent); }
   transition: opacity var(--transition);
 }
 
-/* --------------------------------------------------------------------------
-   6. Detail panel
-   -------------------------------------------------------------------------- */
 
 .panel {
   position: relative;
@@ -508,7 +471,6 @@ a:hover { color: var(--accent); }
   margin-bottom: var(--space-2);
 }
 
-/* Field list: label above value, so long values are never squeezed. */
 .fields { display: grid; gap: var(--space-3); }
 .field__label {
   font-family: var(--font-sans);
@@ -540,14 +502,13 @@ a:hover { color: var(--accent); }
 .refs { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-3); }
 .refs li {
   padding-left: 1.1em;
-  text-indent: -1.1em;         /* hanging indent, bibliography style */
+  text-indent: -1.1em;         
   font-size: 0.9em;
   line-height: 1.5;
   color: var(--ink-2);
 }
 .refs a { color: var(--accent); }
 
-/* Provenance / caveat notes */
 .note {
   padding: var(--space-3) var(--space-4);
   background: var(--surface);
@@ -557,9 +518,6 @@ a:hover { color: var(--accent); }
   color: var(--ink-2);
 }
 
-/* --------------------------------------------------------------------------
-   7. Prose sections below the map
-   -------------------------------------------------------------------------- */
 
 .section { padding: var(--space-7) 0; border-top: 1px solid var(--rule); }
 
@@ -580,7 +538,6 @@ a:hover { color: var(--accent); }
   max-width: 30ch;
 }
 
-/* Distribution: the chart spans the full column width. */
 .distribution {
   display: grid;
   gap: var(--space-6);
@@ -607,7 +564,6 @@ a:hover { color: var(--accent); }
   margin-bottom: var(--space-4);
 }
 
-/* Stat row above the chart */
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -630,9 +586,6 @@ a:hover { color: var(--accent); }
   margin-top: var(--space-2);
 }
 
-/* --------------------------------------------------------------------------
-   8. Bibliography
-   -------------------------------------------------------------------------- */
 
 .bibliography { max-width: 84ch; margin: 0; padding: 0; list-style: none; }
 .bibliography li {
@@ -644,10 +597,6 @@ a:hover { color: var(--accent); }
   color: var(--ink-2);
 }
 .bibliography a { color: var(--accent); }
-
-/* --------------------------------------------------------------------------
-   9. Motion preferences
-   -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
