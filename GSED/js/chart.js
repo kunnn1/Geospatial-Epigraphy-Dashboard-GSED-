@@ -9,7 +9,7 @@ App.chart = (function () {
   const MARGIN = { top: 4, right: 18, bottom: 22, left: 132 };
   const ROW_HEIGHT = 26;
   const ROW_GAP = 7;
-  const SEGMENT_GAP = 2;      // surface-coloured gap between stacked segments
+  const SEGMENT_GAP = 2;      
   const BAR_RADIUS = 3;
 
   function init(options) {
